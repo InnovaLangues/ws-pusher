@@ -1,0 +1,15 @@
+#app:
+#    resource: "@AppBundle/Controller/"
+#    type:     annotation
+
+app:
+    resource: "@AppBundle/Controller/AppController.php"
+    type:     rest
+
+token:
+    resource: "@AppBundle/Controller/TokenController.php"
+    type:     rest
+
+NelmioApiDocBundle:
+    resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
+    prefix:   /api/doc
