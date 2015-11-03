@@ -2,13 +2,9 @@
 #    resource: "@AppBundle/Controller/"
 #    type:     annotation
 
-app:
-    resource: "@AppBundle/Controller/AppController.php"
-    type:     rest
-
-token:
-    resource: "@AppBundle/Controller/TokenController.php"
-    type:     rest
+app: 
+    type: rest
+    resource: "@AppBundle/Resources/config/apps_routes.yml"
 
 NelmioApiDocBundle:
     resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
