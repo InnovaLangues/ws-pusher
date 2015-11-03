@@ -35,6 +35,11 @@ class Token
      */
     private $secret;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App", inversedBy="tokens")
+     */
+    private $app;
+
 
     /**
      * Get id

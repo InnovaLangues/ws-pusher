@@ -38,6 +38,19 @@ class App
     private $slug;
 
     /**
+     * @ORM\OneToMany(targetEntity="Token", mappedBy="app")
+     */
+    private $tokens;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->tokens = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+    
+    /**
      * Get id
      *
      * @return integer
@@ -94,5 +107,38 @@ class App
     {
         return $this->slug;
     }
-}
 
+    /**
+     * Add token
+     *
+     * @param \AppBundle\Entity\Token $token
+     *
+     * @return App
+     */
+    public function addToken(\AppBundle\Entity\Token $token)
+    {
+        $this->tokens[] = $token;
+
+        return $this;
+    }
+
+    /**
+     * Remove token
+     *
+     * @param \AppBundle\Entity\Token $token
+     */
+    public function removeToken(\AppBundle\Entity\Token $token)
+    {
+        $this->tokens->removeElement($token);
+    }
+
+    /**
+     * Get tokens
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getTokens()
+    {
+        return $this->tokens;
+    }
+}
