@@ -24,7 +24,7 @@ class Token
     /**
      * @var guid
      *
-     * @ORM\Column(name="key", type="string", length=20, unique=true)
+     * @ORM\Column(name="authkey", type="string", length=20, unique=true)
      */
     private $key;
 
@@ -52,27 +52,27 @@ class Token
     }
 
     /**
-     * Set guid
+     * Set key
      *
-     * @param guid $guid
+     * @param key $key
      *
      * @return Token
      */
-    public function setGuid($guid)
+    public function setKey($key)
     {
-        $this->guid = $guid;
+        $this->key = $key;
 
         return $this;
     }
 
     /**
-     * Get guid
+     * Get key
      *
-     * @return guid
+     * @return key
      */
-    public function getGuid()
+    public function getKey()
     {
-        return $this->guid;
+        return $this->key;
     }
 
     /**
@@ -98,5 +98,28 @@ class Token
     {
         return $this->secret;
     }
-}
 
+    /**
+     * Set app
+     *
+     * @param \AppBundle\Entity\App $app
+     *
+     * @return Token
+     */
+    public function setApp(\AppBundle\Entity\App $app = null)
+    {
+        $this->app = $app;
+
+        return $this;
+    }
+
+    /**
+     * Get app
+     *
+     * @return \AppBundle\Entity\App
+     */
+    public function getApp()
+    {
+        return $this->app;
+    }
+}

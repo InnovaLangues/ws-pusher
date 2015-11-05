@@ -9,6 +9,8 @@ use FOS\RestBundle\View\View;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use AppBundle\Entity\Token;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,5 +63,65 @@ class AppController extends FOSRestController
             ->getRepository('AppBundle:App');
 
         return $repository->findOneByGuid($guid);
+    }
+
+    /**
+     * Get tokens for a given App.
+     *
+     * @ApiDoc(
+     *     resource = true,
+     *     description = "Gets Tokens for a given App",
+     *     output = "AppBundle\Entity\Token",
+     *     statusCodes = {
+     *         200 = "Returned when successful",
+     *         404 = "Returned when the app is not found"
+     *     }
+     * )
+     *
+     * @Annotations\View() 
+     * @param int $guid the app guid
+     * @return array
+     * @throws NotFoundHttpException when page not exist
+     */
+    public function postAppTokensAction($guid)
+    {
+        $request = $this->get('request');
+
+        //$data = json_decode($request->getContent());
+          die($request->getContent());
+
+
+        if ($request->request->get('key') && $request->request->get('secret')) {
+
+            $entityManager = $this->getDoctrine()->getManager();
+           
+            $repository = $this->getDoctrine()
+                ->getRepository('AppBundle:App');
+
+            $app = $repository->findOneByGuid($guid);
+
+            $token = new Token();
+
+            $token->setKey($request->request->get('key'));
+            $token->setSecret($request->request->get('secret'));
+            $token->setApp($app);
+
+            $entityManager->persist($token);
+
+            $entityManager->flush();
+            
+            return $app;
+        }
+
+        //Todo handle errors
+        if (!$request->request->get('key')) {
+            return 'no key';
+        }
+
+        if (!$request->request->get('secret')) {
+            return 'no secret';
+        }
+
+        return 'ERROR';
     }
 }
