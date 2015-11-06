@@ -87,13 +87,16 @@ class AppController extends FOSRestController
     {
         $request = $this->get('request');
 
-        //$data = json_decode($request->getContent());
-          die($request->getContent());
+        if (!$request->request->get('key')) {
+            return 'no key';
+        }
 
+        if (!$request->request->get('secret')) {
+            return 'no secret';
+        }
 
         if ($request->request->get('key') && $request->request->get('secret')) {
 
-            $entityManager = $this->getDoctrine()->getManager();
            
             $repository = $this->getDoctrine()
                 ->getRepository('AppBundle:App');
@@ -106,22 +109,16 @@ class AppController extends FOSRestController
             $token->setSecret($request->request->get('secret'));
             $token->setApp($app);
 
-            $entityManager->persist($token);
+            try {
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($token);
+                $entityManager->flush();
 
-            $entityManager->flush();
-            
-            return $app;
+                return $app;
+            } catch(\Exception $e) {
+                throw new \Exception('Could not persist token');
+            }
+
         }
-
-        //Todo handle errors
-        if (!$request->request->get('key')) {
-            return 'no key';
-        }
-
-        if (!$request->request->get('secret')) {
-            return 'no secret';
-        }
-
-        return 'ERROR';
     }
 }
