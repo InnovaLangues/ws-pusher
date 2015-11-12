@@ -14,6 +14,11 @@ use AppBundle\Entity\Token;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
+
 
 class AppController extends FOSRestController
 {
@@ -62,7 +67,16 @@ class AppController extends FOSRestController
         $repository = $this->getDoctrine()
             ->getRepository('AppBundle:App');
 
-        return $repository->findOneByGuid($guid);
+        $entity = $repository->findOneByGuid($guid);
+
+        throw new HttpException(400, "blahblah");
+
+        if (!$entity) {
+            throw $this->createNotFoundException('Unable to find app entity');
+        }
+
+
+        return $entity; 
     }
 
     /**
@@ -88,37 +102,33 @@ class AppController extends FOSRestController
         $request = $this->get('request');
 
         if (!$request->request->get('key')) {
-            return 'no key';
+            throw new HttpException(500, 'Missing Key');
         }
 
         if (!$request->request->get('secret')) {
-            return 'no secret';
+            throw new HttpException(500, 'Missing Secret');
         }
 
-        if ($request->request->get('key') && $request->request->get('secret')) {
+        $repository = $this->getDoctrine()
+            ->getRepository('AppBundle:App');
 
-           
-            $repository = $this->getDoctrine()
-                ->getRepository('AppBundle:App');
+        $app = $repository->findOneByGuid($guid);
 
-            $app = $repository->findOneByGuid($guid);
+        $token = new Token();
 
-            $token = new Token();
+        $token->setKey($request->request->get('key'));
+        $token->setSecret($request->request->get('secret'));
+        $token->setApp($app);
 
-            $token->setKey($request->request->get('key'));
-            $token->setSecret($request->request->get('secret'));
-            $token->setApp($app);
+        try {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($token);
+            $entityManager->flush();
 
-            try {
-                $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->persist($token);
-                $entityManager->flush();
+            return $app;
 
-                return $app;
-            } catch(\Exception $e) {
-                throw new \Exception('Could not persist token');
-            }
-
-        }
+        } catch(\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+            throw new HttpException(500, "Token already exists");
+        }  
     }
 }
