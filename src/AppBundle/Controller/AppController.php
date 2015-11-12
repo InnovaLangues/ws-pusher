@@ -69,12 +69,9 @@ class AppController extends FOSRestController
 
         $entity = $repository->findOneByGuid($guid);
 
-        throw new HttpException(400, "blahblah");
-
         if (!$entity) {
-            throw $this->createNotFoundException('Unable to find app entity');
+            throw new HttpException(404, "Entity App not found");
         }
-
 
         return $entity; 
     }

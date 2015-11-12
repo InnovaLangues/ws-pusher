@@ -76,11 +76,12 @@ fos_rest:
             json: true
     exception:
         enabled: true
-        #codes:
-        #    'Symfony\Component\Routing\Exception\ResourceNotFoundException': 404
-        #    'Doctrine\ORM\OptimisticLockException': HTTP_CONFLICT
+        codes:
+            'Symfony\Component\Routing\Exception\ResourceNotFoundException': 404
+            'Doctrine\ORM\OptimisticLockException': HTTP_CONFLICT
         messages:
-            Symfony\Component\HttpKernel\Exception\HttpException: true
+            'Symfony\Component\Routing\Exception\ResourceNotFoundException': true
+            'Symfony\Component\HttpKernel\Exception\HttpException': true
     allowed_methods_listener: true
     access_denied_listener:
         json: true
