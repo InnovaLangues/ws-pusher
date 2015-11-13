@@ -1,8 +1,3 @@
 apps:
     type:     rest
     resource: AppBundle\Controller\AppController
-
-tokens:
-    type:     rest
-    parent:   apps
-    resource: AppBundle\Controller\TokenController

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity;
 
+use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -39,6 +40,14 @@ class Token
      * @ORM\ManyToOne(targetEntity="App", inversedBy="tokens")
      */
     private $app;
+
+    /**
+     * @var \DateTime $created
+     *
+     * @Gedmo\Timestampable(on="create")
+     * @ORM\Column(type="datetime")
+     */
+    private $created;
 
 
     /**
@@ -121,5 +130,10 @@ class Token
     public function getApp()
     {
         return $this->app;
+    }
+
+    public function getCreated()
+    {
+        return $this->created;
     }
 }

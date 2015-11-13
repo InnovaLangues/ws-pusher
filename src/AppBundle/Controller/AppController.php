@@ -58,16 +58,16 @@ class AppController extends FOSRestController
      * )
      *
      * @Annotations\View() 
-     * @param int $guid the app guid
+     * @param int $appGuid the app guid
      * @return array
      * @throws NotFoundHttpException when page not exist
      */
-    public function getAppAction($guid)
+    public function getAppAction($appGuid)
     {
         $repository = $this->getDoctrine()
             ->getRepository('AppBundle:App');
 
-        $entity = $repository->findOneByGuid($guid);
+        $entity = $repository->findOneByGuid($appGuid);
 
         if (!$entity) {
             throw new HttpException(404, "Entity App not found");
@@ -90,11 +90,11 @@ class AppController extends FOSRestController
      * )
      *
      * @Annotations\View() 
-     * @param int $guid the app guid
+     * @param int $appGuid the app guid
      * @return array
      * @throws NotFoundHttpException when page not exist
      */
-    public function postAppTokensAction($guid)
+    public function postAppTokensAction($appGuid)
     {
         $request = $this->get('request');
 
@@ -109,7 +109,7 @@ class AppController extends FOSRestController
         $repository = $this->getDoctrine()
             ->getRepository('AppBundle:App');
 
-        $app = $repository->findOneByGuid($guid);
+        $app = $repository->findOneByGuid($appGuid);
 
         $token = new Token();
 
@@ -127,5 +127,42 @@ class AppController extends FOSRestController
         } catch(\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
             throw new HttpException(500, "Token already exists");
         }  
+    }
+
+    /**
+     * Removes a token.
+     *
+     * @ApiDoc(
+     *   resource = true,
+     *   statusCodes={
+     *     204="Returned when successful"
+     *   }
+     * )
+     *
+     * @return View
+     */
+    public function deleteAppTokenAction($appGuid, $tokenKey) {
+        $token = $this->getDoctrine()
+            ->getRepository('AppBundle:Token')
+            ->findOneByKey($tokenKey);
+
+        if (!$token) {
+            throw new HttpException(404, "Token not found");
+        }
+
+        try {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($token);
+            $entityManager->flush();
+
+        } catch(\Exception $e) {
+            throw new HttpException(500, "Your Token Entity could not be deleted");
+        }  
+
+        $app = $this->getDoctrine()
+            ->getRepository('AppBundle:App')
+            ->findOneByGuid($appGuid);
+
+        return $app;
     }
 }
