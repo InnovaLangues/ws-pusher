@@ -38,7 +38,7 @@ class App
     private $slug;
 
     /**
-     * @ORM\OneToMany(targetEntity="Token", mappedBy="app")
+     * @ORM\OneToMany(targetEntity="Token", mappedBy="app", cascade={"remove"})
      */
     private $tokens;
 

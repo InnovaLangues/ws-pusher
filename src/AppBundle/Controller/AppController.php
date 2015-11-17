@@ -10,6 +10,7 @@ use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use AppBundle\Entity\Token;
+use AppBundle\Entity\App;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -74,6 +75,53 @@ class AppController extends FOSRestController
         }
 
         return $entity; 
+    }
+
+     /**
+     * Creates an App.
+     *
+     * @ApiDoc(
+     *     resource = true,
+     *     description = "Gets Tokens for a given App",
+     *     output = "AppBundle\Entity\App",
+     *     statusCodes = {
+     *         200 = "Returned when successful",
+     *         404 = "Returned when the app is not found"
+     *     }
+     * )
+     *
+     * @Annotations\View() 
+     * @return array
+     * @throws NotFoundHttpException when page not exist
+     */
+    public function postAppAction()
+    {
+        $request = $this->get('request');
+
+        $slug = $request->request->get('slug');
+
+        if (!$slug) {
+            throw new HttpException(500, 'Missing Slug');
+        }
+
+        $app = new App();
+
+        $app->setSlug($slug);
+        $app->setGuid(rand());
+
+        try {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($app);
+            $entityManager->flush();
+
+            return $app;
+
+        } catch(\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
+            throw new HttpException(500, "App already exists");
+
+        } catch(\Exception $e) {
+            throw new HttpException(500, $e . " : The app could not be created");
+        }  
     }
 
     /**
@@ -164,5 +212,38 @@ class AppController extends FOSRestController
             ->findOneByGuid($appGuid);
 
         return $app;
+    }
+
+    /**
+     * Removes an app.
+     *
+     * @ApiDoc(
+     *   resource = true,
+     *   statusCodes={
+     *     204="Returned when successful"
+     *   }
+     * )
+     *
+     * @return View
+     */
+    public function deleteAppAction($appGuid) {
+        $app = $this->getDoctrine()
+            ->getRepository('AppBundle:App')
+            ->findOneByGuid($appGuid);
+
+        if (!$appGuid) {
+            throw new HttpException(404, "App not found");
+        }
+
+        try {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($app);
+            $entityManager->flush();
+
+        } catch(\Exception $e) {
+            throw new HttpException(500, "Your App Entity could not be deleted");
+        }  
+
+        throw new HttpException(204);
     }
 }
