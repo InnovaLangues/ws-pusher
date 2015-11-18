@@ -49,6 +49,18 @@ class Token
      */
     private $created;
 
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->setKey(
+            substr( md5(rand()), 0, 20)
+        );
+        $this->setSecret(
+            substr( md5(rand()), 0, 20)
+        );
+    }
 
     /**
      * Get id

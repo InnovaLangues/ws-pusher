@@ -105,19 +105,21 @@ class AppController extends FOSRestController
         }
 
         $app = new App();
-
         $app->setSlug($slug);
-        $app->setGuid(rand());
+
+        $token = new Token();
+        $token->setApp($app);
 
         try {
             $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($token);
             $entityManager->persist($app);
             $entityManager->flush();
 
             return $app;
 
         } catch(\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
-            throw new HttpException(500, "App already exists");
+            throw new HttpException(500, "App or Token already exists");
 
         } catch(\Exception $e) {
             throw new HttpException(500, $e . " : The app could not be created");
@@ -144,25 +146,12 @@ class AppController extends FOSRestController
      */
     public function postAppTokensAction($appGuid)
     {
-        $request = $this->get('request');
-
-        if (!$request->request->get('key')) {
-            throw new HttpException(500, 'Missing Key');
-        }
-
-        if (!$request->request->get('secret')) {
-            throw new HttpException(500, 'Missing Secret');
-        }
-
         $repository = $this->getDoctrine()
             ->getRepository('AppBundle:App');
 
         $app = $repository->findOneByGuid($appGuid);
 
         $token = new Token();
-
-        $token->setKey($request->request->get('key'));
-        $token->setSecret($request->request->get('secret'));
         $token->setApp($app);
 
         try {
@@ -170,7 +159,7 @@ class AppController extends FOSRestController
             $entityManager->persist($token);
             $entityManager->flush();
 
-            return $app;
+            return $token;
 
         } catch(\Doctrine\DBAL\Exception\UniqueConstraintViolationException $e) {
             throw new HttpException(500, "Token already exists");

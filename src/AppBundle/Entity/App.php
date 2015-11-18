@@ -38,9 +38,17 @@ class App
     private $slug;
 
     /**
-     * @ORM\OneToMany(targetEntity="Token", mappedBy="app", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="Token", mappedBy="app", cascade={"remove", "persist"})
      */
     private $tokens;
+
+    /**
+     * @var \DateTime $created
+     *
+     * @Gedmo\Timestampable(on="create")
+     * @ORM\Column(type="datetime")
+     */
+    private $created;
 
     /**
      * Constructor
@@ -48,6 +56,7 @@ class App
     public function __construct()
     {
         $this->tokens = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->setGuid(rand()); //todo change this
     }
     
     /**
@@ -140,5 +149,10 @@ class App
     public function getTokens()
     {
         return $this->tokens;
+    }
+
+    public function getCreated()
+    {
+        return $this->created;
     }
 }
